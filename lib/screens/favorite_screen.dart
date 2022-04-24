@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
+import 'package:shop/modal/favorite.dart';
 
 import '../utils/colors.dart';
 
@@ -12,7 +14,8 @@ class FavoriteScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    favoriteList = ModalRoute.of(context)?.settings.arguments as List;
+    final favoriteProvider = Provider.of<Favorite>(context);
+    favoriteList =favoriteProvider.getFavoriteList();
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(0.9),
       appBar: AppBar(
@@ -86,16 +89,16 @@ class FavoriteScreen extends StatelessWidget {
                             //globalSetState[index] = setState;
                             return InkWell(
                               onTap: () {
-                                setState(() {
-                                  favoriteList[index]['isFav'] =
-                                  !favoriteList[index]['isFav'];
-                                });
+                                favoriteProvider.removeItem(favoriteList[index]['id']);
+
 
                               },
                               child: Container(
                                 child: SvgPicture.asset(
-                                   'assets/icons/fav.svg'
-                                      ,
+                                  favoriteList[index]['isFav']
+                                      ? 'assets/icons/fav.svg'
+                                      : 'assets/icons/favorite.svg',
+
                                   width: 25,
                                 ),
                                 margin: EdgeInsets.symmetric(horizontal: 12),

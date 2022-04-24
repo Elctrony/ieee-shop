@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
+import 'package:shop/modal/favorite.dart';
 import 'package:shop/utils/colors.dart';
 import 'dart:math';
+
 class HomeScreen extends StatelessWidget {
   HomeScreen({Key? key}) : super(key: key);
   final List<Map<String, dynamic>> listItem = [
     {
+      'id': 1,
       'title': 'Apple Watch',
       'img': 'assets/images/apple.png',
       'description': 'Lorem Ipsum is simply dummy text of the printing and',
@@ -14,6 +18,7 @@ class HomeScreen extends StatelessWidget {
       'isCart': false,
     },
     {
+      'id': 2,
       'title': 'Air jorden',
       'img': 'assets/images/airjorden.png',
       'description': 'Lorem Ipsum is simply dummy text of the printing and',
@@ -22,6 +27,7 @@ class HomeScreen extends StatelessWidget {
       'isCart': false,
     },
     {
+      'id': 6,
       'title': 'Airpods',
       'img': 'assets/images/airpod_product.png',
       'description': 'Lorem Ipsum is simply dummy text of the printing and',
@@ -30,6 +36,7 @@ class HomeScreen extends StatelessWidget {
       'isCart': false,
     },
     {
+      'id': 3,
       'title': 'Amazon Speakre',
       'img': 'assets/images/amazon.png',
       'description': 'Lorem Ipsum is simply dummy text of the printing and',
@@ -38,6 +45,7 @@ class HomeScreen extends StatelessWidget {
       'isCart': false,
     },
     {
+      'id': 4,
       'title': 'Google shirt',
       'img': 'assets/images/tshirt.png',
       'description': 'Lorem Ipsum is simply dummy text of the printing and',
@@ -46,6 +54,7 @@ class HomeScreen extends StatelessWidget {
       'isCart': false,
     },
     {
+      'id': 5,
       'title': 'Speaker',
       'img': 'assets/images/product3.png',
       'description': 'Lorem Ipsum is simply dummy text of the printing and',
@@ -54,12 +63,13 @@ class HomeScreen extends StatelessWidget {
       'isCart': false,
     }
   ];
-
-  final favList = [];
+  List<Map> favList = [];
   late List<Function> globalSetState;
 
   @override
   Widget build(BuildContext context) {
+    final favoriteProvider = Provider.of<Favorite>(context);
+    favList = favoriteProvider.getFavoriteList();
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(0.9),
       appBar: AppBar(
@@ -68,7 +78,9 @@ class HomeScreen extends StatelessWidget {
         actions: [
           InkWell(
             onTap: () {
-              Navigator.of(context).pushNamed('/favorite',arguments: favList).then((value) => print(value));
+              Navigator.of(context)
+                  .pushNamed('/favorite')
+                  .then((value) => print(value));
               print('Send');
             },
             child: Container(
@@ -158,7 +170,7 @@ class HomeScreen extends StatelessWidget {
                         child: Image.asset(listItem[index]['img']),
                         decoration: BoxDecoration(
                           color: colorAvaliable[
-                          Random().nextInt(colorAvaliable.length)],
+                              Random().nextInt(colorAvaliable.length)],
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(25),
                             bottomLeft: Radius.circular(25),
@@ -198,15 +210,23 @@ class HomeScreen extends StatelessWidget {
                             //globalSetState[index] = setState;
                             return InkWell(
                               onTap: () {
+                                if (listItem[index]['isFav']) {
+                                  favoriteProvider
+                                      .removeItem(listItem[index]['id']);
+                                } else {
+                                  favoriteProvider.addItem(listItem[index]);
+                                }
                                 setState(() {
                                   listItem[index]['isFav'] =
-                                  !listItem[index]['isFav'];
+                                      !listItem[index]['isFav'];
                                 });
-                                  favList.add(listItem[index]);
                               },
                               child: Container(
                                 child: SvgPicture.asset(
-                                  listItem[index]['isFav']
+                                  favList.indexWhere((element) =>
+                                              element['id'] ==
+                                              listItem[index]['id']) !=
+                                          -1
                                       ? 'assets/icons/fav.svg'
                                       : 'assets/icons/favorite.svg',
                                   width: 25,
@@ -220,7 +240,7 @@ class HomeScreen extends StatelessWidget {
                               onTap: () {
                                 setState(() {
                                   listItem[index]['isCart'] =
-                                  !listItem[index]['isCart'];
+                                      !listItem[index]['isCart'];
                                 });
                               },
                               child: CircleAvatar(
